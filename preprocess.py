@@ -3,6 +3,7 @@ import torch
 import argparse
 import os
 from transformers import GPT2Tokenizer
+from torch.nn.utils.rnn import pad_sequence
 from tqdm import tqdm
 
 
@@ -19,14 +20,16 @@ class SummaryDataset(Dataset):
 
         self.documents = []
         self.labels = []
+        self.lengths = []
 
         for file in tqdm(files):
             try:
                 with open(input_folder + '/' + file) as f:
                     raw = f.read()
-                    document, label = self.parse_document(raw)
-                    self.documents.append(document)
+                    document, label, lengths = self.parse_document(raw)
+                    self.documents.append(pad_sequence(document, batch_first=True))
                     self.labels.append(label)
+                    self.lengths.append(lengths)
             except Exception:
                 print("failed to read", file)
                 continue
@@ -36,15 +39,17 @@ class SummaryDataset(Dataset):
         document = self.insert_names(document[1], document[3])
 
         lines = []
+        lengths = []
         labels = []
         for line_label in document:
             line_label = line_label.split('\t\t\t')
             line = line_label[0]
-            lines.append(self.tokenizer.encode(line, add_special_tokens=False))
-
+            encoded = self.tokenizer.encode(line, add_special_tokens=False)
+            lengths.append(len(encoded))
+            lines.append(torch.tensor(encoded))
             label = int(line_label[1])
             labels.append(1 if label == 1 else 0)
-        return lines, labels
+        return lines, torch.tensor(labels), torch.tensor(lengths)
 
     def insert_names(self, document, names):
         '''
@@ -81,6 +86,8 @@ class SummaryDataset(Dataset):
     def __getitem__(self, idx):
         # TODO: Convert to tensor once we know what the model looks like
         item = {
+            "paragraph_length": self.documents[idx].size()[0],
+            "sentence_length": self.lengths[idx],
             "document": self.documents[idx],
             "labels": self.labels[idx],
         }
