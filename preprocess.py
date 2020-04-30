@@ -8,6 +8,7 @@ from tqdm import tqdm
 
 class SummaryDataset(Dataset):
     '''
+        This processes the CNN DailyMail Dataset
         Sections are split by \n\n
         Sentence and labels are split by \t\t\t
         I chose to use the GPT2Tokenizer because it uses BPE trained on a large dataset
