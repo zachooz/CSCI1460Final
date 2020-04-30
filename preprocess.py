@@ -1,12 +1,6 @@
-import nltk
-from torch.utils.data import Dataset, DataLoader
+from torch.utils.data import Dataset
 import torch
-import re
 import argparse
-from nltk.corpus import wordnet
-import numpy as np
-import random
-import string
 import os
 from transformers import GPT2Tokenizer
 from tqdm import tqdm
@@ -90,7 +84,6 @@ class SummaryDataset(Dataset):
             "labels": self.labels[idx],
         }
         return item
-
 
 
 if __name__ == "__main__":
