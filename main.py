@@ -29,16 +29,19 @@ if __name__ == "__main__":
     # Hint: Use random_split to split dataset into train and validate datasets
     
     vocab_size = 1000
+    paragraph_size = 30
 
     model = SummaryModel(
         vocab_size,
         128,
         128,
-        512
+        512,
+        30
     ).to(device)
 
     input = torch.LongTensor(np.random.randint(0,999,(5,30,10))).to(device)
     paragraph_lengths = torch.Tensor(np.random.randint(1,30,(5,))).to(device)
     sentence_lengths = torch.Tensor(np.random.randint(1,10,(5,30))).to(device)
     output = model(input, paragraph_lengths, sentence_lengths)
+    print(output.shape)
 

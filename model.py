@@ -6,13 +6,13 @@ import numpy as np
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-def reverse( tensor):
+def reverse(tensor):
     idx = [i for i in range(tensor.size(0)-1, -1, -1)]
     idx = torch.LongTensor(idx).to(device)
     return tensor.index_select(0, idx)
 
 class SummaryModel(nn.Module):
-    def __init__(self, vocab_size, word_rnn_size, sentence_rnn_size, embedding_size):
+    def __init__(self, vocab_size, word_rnn_size, sentence_rnn_size, embedding_size, paragraph_size):
         """
         The Model class for SummaRuNNer
 
@@ -39,17 +39,19 @@ class SummaryModel(nn.Module):
         self.AvgPool1 = torch.nn.AvgPool1d(2)
         self.AvgPool2 = torch.nn.AvgPool1d(2)
 
-        #self.linear = torch.nn.Linear()
+        self.linear = torch.nn.Linear(sentence_rnn_size, 2)
 
 
     
 
     """
     Given a list of sentences, run the word level bidirectional RNN to compute the word level representations
-    for each sentence.
+    for each sentence. The word level representation for a sentence is obtained by first taking the final 
+    hidden states obtained by the forward and backward GRU. These hidden states are then concatenated together 
+    and average pooled
 
-    :param paragraph: A list of sentences. Each sentence is a list of token ids
-    :param sentence_lengths: The actual lengths (no padding) of each sentence in the paragraph
+    :param paragraph: A tensor (paragraph_size, sentence_size) of sentences. Each sentence is a list of token ids.
+    :param sentence_lengths: A tensor (paragraph_size,) representing the actual lengths (no padding) of each sentence in the paragraph
     """
     def compute_word_level_representation(self, paragraph, sentence_lengths):
         # Word level GRU applied to each sentence in paragraph
@@ -67,6 +69,14 @@ class SummaryModel(nn.Module):
         pooled = self.AvgPool1(word_level_representations)
         return torch.squeeze(pooled)
 
+    """
+    Given a list of word_level_representations, run the sentence level bidirectional RNN to compute the sentence
+    level representations. The sentence level representations for a paragraph are obtained by taking the outputs
+    at each timestep of the sentence level RNNs over the paragraph.
+
+    :param hidden_states: A tensor containing paragraphs (batch_size, paragraph_size, word_rnn_size).
+    :param sentence_lengths: A tensor (batch_size,) containing the actual lengths of each sentence in the paragraph
+    """
     def compute_sentence_level_representation(self, hidden_states, paragraph_lengths):
         
         hidden_states_reversed = reverse(hidden_states)
@@ -74,13 +84,15 @@ class SummaryModel(nn.Module):
 
         packed_seq = pack_padded_sequence(hidden_states, paragraph_lengths, batch_first=True, enforce_sorted = False)
         packed_seq_reversed = pack_padded_sequence(hidden_states_reversed, reversed_lengths, batch_first=True, enforce_sorted = False)
-        _, out = self.sentence_gru(packed_seq)
-        _, out_reversed = self.sentence_gru_reversed(packed_seq_reversed)
+        out, _ = self.sentence_gru(packed_seq)
+        out_reversed, _ = self.sentence_gru_reversed(packed_seq_reversed)
+
+        padded_seq, lengths = pad_packed_sequence(out, batch_first=True, total_length=hidden_states.shape[1])
+        padded_seq_reversed, reversed_lengths = pad_packed_sequence(out_reversed, batch_first=True, total_length=hidden_states.shape[1])
 
         # Concatenate the two results and average pool them
-        sentence_representations = torch.cat((out, out_reversed), 2)
-        pooled = self.AvgPool1(sentence_representations)
-        return torch.squeeze(pooled)
+        sentence_representations = torch.cat((padded_seq, padded_seq_reversed), 2)
+        return self.AvgPool1(sentence_representations)
 
 
 
@@ -101,17 +113,15 @@ class SummaryModel(nn.Module):
         #TODO: Figure out how to parallelize the model
 
         # Compute word level representations over all sentences
-        #word_level_outputs = self.compute_sentence_representation(inputs, sentence_lengths)
+        # Result should have shape (batch_size, paragraph_size, word_rnn_size)
         word_level_outputs =[self.compute_word_level_representation(inputs[i], sentence_lengths[i]) for i in range(len(inputs))]
         word_level_outputs = torch.stack(word_level_outputs)
 
         # Run sentence level bidirectional GRU over the resulting hidden states
+        # Should have shape (batch_size, paragraph_size, sentence_rnn_size) 
         sentence_level_outputs = self.compute_sentence_level_representation(word_level_outputs, paragraph_lengths)
-        print(sentence_level_outputs.shape)
-
-        # Concatenate the two results and average pool them
 
         # TODO: Apply non-linear transformation as described in paper to get representation of document
 
-
         # Add logistic layer to make binary decision
+        return self.linear(sentence_level_outputs)
