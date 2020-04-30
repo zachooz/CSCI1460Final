@@ -38,7 +38,7 @@ if __name__ == "__main__":
     ).to(device)
 
     input = torch.LongTensor(np.random.randint(0,999,(5,30,10))).to(device)
-    paragraph_lengths = torch.Tensor(np.random.randint(1,30,(5,)))
-    sentence_lengths = torch.Tensor(np.random.randint(1,10,(5,30)))
+    paragraph_lengths = torch.Tensor(np.random.randint(1,30,(5,))).to(device)
+    sentence_lengths = torch.Tensor(np.random.randint(1,10,(5,30))).to(device)
     output = model(input, paragraph_lengths, sentence_lengths)
 
