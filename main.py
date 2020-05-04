@@ -121,7 +121,7 @@ def validate(model, test_loader):
 
         print("loss", loss.item())
 
-# python main.py -l -T data/dailymail/validate
+# python main.py -l -T data/dailymail/train
 # python main.py -l -t data/dailymail/test
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
