@@ -6,7 +6,7 @@ from torch.nn import functional as F
 import torch
 import argparse
 import numpy as np
-from preprocess import SummaryDataset
+from preprocess import SummaryDataset, pad_sequence
 from tqdm import tqdm  # optional progress bar
 from transformers import GPT2Tokenizer
 
@@ -76,7 +76,6 @@ def train(model, train_loader, hyperparams):
             loss.backward()  # calculate gradients
             optimizer.step()  # update model weights
 
-            perplexity = torch.exp(loss).item()
             print("loss:", loss.item())
 
         torch.save(model.state_dict(), './model.pt')
@@ -121,8 +120,48 @@ def validate(model, test_loader):
 
         print("loss", loss.item())
 
+def summarize_file(model, file, tokenizer, max_sentence_size):
+    model = model.eval()
+    with open(file) as f:
+        raw = f.read()
+        sentences = raw.split('\n')
+        document, sentence_length = parse_file(sentences, tokenizer, max_sentence_size)
+
+    paragraph_length = document.size()[0]
+
+    sentence_length = sentence_length.unsqueeze(0).to(device)
+    paragraph_length = torch.tensor(paragraph_length).unsqueeze(0).to(device)
+    document = document.unsqueeze(0).to(device)
+
+    y_pred = model(document, paragraph_length, sentence_length)
+    y_pred = y_pred.detach().cpu()[0].numpy()
+
+    summary = []
+
+    for i in range(len(sentences)):
+        if y_pred[i] > 0.7:
+            summary.append(sentences[i])
+
+    return summary, len(summary), len(sentences)
+
+
+
+def parse_file(document, tokenizer, max_sentence_size):
+    # link = document[0]
+    lines = []
+    lengths = []
+    for line in document:
+        encoded = tokenizer.encode(line, add_special_tokens=False)
+        if len(encoded) > max_sentence_size or len(encoded) < 1:
+            print("SKIP", line)
+            continue
+        lengths.append(len(encoded))
+        lines.append(torch.tensor(encoded))
+    return pad_sequence(lines, batch_first=True, max_len=max_sentence_size), torch.tensor(lengths)
+
 # python main.py -l -T data/dailymail/train
 # python main.py -l -t data/dailymail/test
+# python main.py -l -F data/examples/apclimate.txt
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
     parser.add_argument("-l", "--load", action="store_true",
@@ -130,6 +169,8 @@ if __name__ == "__main__":
     parser.add_argument("-s", "--save", action="store_true",
                         help="save model.pt")
     parser.add_argument("-T", "--train", action="store",
+                        help="run training loop")
+    parser.add_argument("-F", "--file", action="store",
                         help="run training loop")
     parser.add_argument("-V", "--validate", action="store",
                         help="run training loop")
@@ -193,7 +234,14 @@ if __name__ == "__main__":
         print("loading saved model...")
         model.load_state_dict(torch.load('./model.pt', map_location=device))
 
+    if args.file:
+        print("summarizing file...")
+        summary, sum_len, doc_len = summarize_file(model, args.file, tokenizer, hyperparams['max_sentence_size'])
+        print("Used", sum_len, "of", doc_len, "lines")
+        print(' '.join(summary))
+
     if args.summary:
+        print("summarizing test data...")
         generate_summary(0, test_dataset, model, tokenizer)
 
     if args.train:
