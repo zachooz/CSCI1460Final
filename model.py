@@ -106,36 +106,12 @@ class SummaryModel(nn.Module):
         """
 
         # TODO: Parallelize the model
-        # To parallelize model we need to pass all sentences into a single call word_level_gru
-        # and group their embeddings by paragraph. Then pass that to sentence_level_gru
-
-        # Compute word level representations over all sentences
-        # Result should have shape (batch_size, paragraph_size, word_rnn_size)
+        # Currently only accepts a batch size of 1
 
         word_level_outputs = [self.word_level_gru(inputs[i], sentence_lengths[i]) for i in range(len(inputs))]
         word_level_outputs = torch.stack(word_level_outputs)
 
-        # Parallelization attempt
-        # inputs = inputs.view(-1, self.max_sentence_size)
-        # sentence_lengths = sentence_lengths.view(-1)
-        # word_level_outputs = self.word_level_gru(inputs, sentence_lengths)
-
-        # have to recombine to paragraphs
-        # index = 0
-        # paragraphs = []
-        # for length in paragraph_lengths:
-        #     paragraphs.append(torch.narrow(word_level_outputs, 0, index, index + length))
-        #     index += length
-        #
-        # word_level_outputs = torch.stack(paragraphs)
-
-        # print(paragraphs.size())
-
-        # Run sentence level bidirectional GRU over the resulting hidden states
-        # Should have shape (batch_size, paragraph_size, sentence_rnn_size)
         sentence_level_outputs = self.sentence_level_gru(word_level_outputs, paragraph_lengths)
-
-        # TODO: Apply non-linear transformation as described in paper to get representation of document
 
         # Add logistic layer to make binary decision
         l1 = self.linear(sentence_level_outputs).squeeze(2)
