@@ -9,6 +9,7 @@ import numpy as np
 from preprocess import SummaryDataset, pad_sequence
 from tqdm import tqdm  # optional progress bar
 from transformers import GPT2Tokenizer
+import nltk
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -123,8 +124,9 @@ def validate(model, test_loader):
 def summarize_file(model, file, tokenizer, max_sentence_size):
     model = model.eval()
     with open(file) as f:
-        raw = f.read()
-        sentences = raw.split('\n')
+        raw = f.read().replace('“', '"').replace('”', '"')
+        sentences = nltk.tokenize.sent_tokenize(raw)
+        print(sentences)
         document, sentence_length = parse_file(sentences, tokenizer, max_sentence_size)
 
     paragraph_length = document.size()[0]
