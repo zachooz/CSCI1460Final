@@ -35,3 +35,14 @@ https://apnews.com/f9331cf1ba5e0ebf196f1cc9311fd99d
 Used 9 of 30 lines
 
 Danny Lin cruised his white sports car down Broadway, the bright lights of Times Square gleaming off his sharply detailed Audi R8. He looped through the tourist hotspot again and again, navigating around Corvettes, Mercedes, Mustangs and BMWs -- a parade of high-priced vehicles gathered for a rare photo-op. "I never bring my car here," said the 24-year-old from Queens. "Only for today, to get some cool shots." From a star turn in "Taxi Driver" to the Naked Cowboy to the million people who crowd its streets on New Year's Eve, the "Crossroads of the World" has for generations been an iconic New York backdrop in movies, culture and the arts. Now, Times Square has taken a turn toward Tokyo Drift, just without the "Fast and the Furious," as car-loving New Yorkers flock to the barren streets of the theater district. Car mavens normally wouldn't dare rev their engines in gridlocked Midtown, but they're eagerly driving into Manhattan to take photos and show off for sparse crowds walking through the famed streets. At least 100 pedestrians were wandering the area when the cars began roaring down Times Square's main drag Saturday, along with dozens of motorcycles in one crew that created a deafening buzz. Mike Hodurski and Steve Cruz brought their Chevrolet pickup trucks Wednesday night and took photos in front of a light-up American flag at the corner of Broadway and 43rd Street. Andre Godfrey has driven his 2018 Ford Mustang -- with glowing red shark teeth embedded in the grill -- into Times Square twice.advantage of it now, while nobody's over here," Hodurski said. "The streets are dead. You'd never get to see the streets like this. So we said, 'You know what, screw it,' and we all got together." Andre Godfrey has driven his 2018 Ford Mustang -- with glowing red shark teeth embedded in the grill -- into Times Square twice.
+
+# Requirements
+Python 3
+
+Pytorch
+
+transformers
+
+tqdm
+
+nltk

@@ -125,7 +125,6 @@ def summarize_file(model, file, tokenizer, max_sentence_size):
     with open(file) as f:
         raw = f.read().replace('“', '"').replace('”', '"')
         sentences = nltk.tokenize.sent_tokenize(raw)
-        print(sentences)
         document, sentence_length = parse_file(sentences, tokenizer, max_sentence_size)
 
     paragraph_length = document.size()[0]
