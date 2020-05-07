@@ -1,6 +1,6 @@
 # Summary Generation
 
-This model is trained the the CNN/Dailymail summarization dataset. To train please call `python main.py -l -T <path to dataset>`
+This model is trained the the CNN/Dailymail summarization dataset and performs extractive summarization. To train please call `python main.py -l -T <path to dataset>`
 
 A pretrained model can be found here: https://drive.google.com/file/d/1hE37YKcWBKeI0YviiUjzrcyYHgboPsAR/view?usp=sharing
 
@@ -12,11 +12,14 @@ After training the model simply copy and paste a news article into a text file a
 https://apnews.com/bdcdb1e537c2f23becb3960fbd4a8ed8
 
 Used 3 of 18 lines
+
 In just 50 years, 2 billion to 3.5 billion people, mostly the poor who can't afford air conditioning, will be living in a climate that historically has been too hot to handle, a new study said. With every 1.8 degree (1 degree Celsius) increase in global average annual temperature from man-made climate change, about a billion or so people will end up in areas too warm day-in, day-out to be habitable without cooling technology, according to ecologist Marten Scheffer of Wageningen University in the Netherlands, co-author of the study. Under the worst-case scenarios for population growth and for carbon pollution, which many climate scientists say is looking less likely these days, the study in Monday's journal Proceedings of the National Academy of Sciences predicts about 3.5 billion people will live in extremely hot areas.
 
 ## In Japan, the ‘Murder Hornet’ Is Both a Lethal Threat and a Tasty Treat
 https://www.nytimes.com/2020/05/05/world/asia/murder-hornet-japan.html
+
 Used 11 of 47 lines
+
 Long before the Asian giant hornet began terrorizing the honeybees of Washington State, the ferocious insects posed a sometimes lethal threat to hikers and farmers in the mountains of rural Japan. But in the central Chubu region, these insects -- sometimes called "murder hornets" -- are known for more than their aggression and excruciating sting.  The adults, which can be two inches long, are fried on skewers, stinger and all, until the carapace becomes light and crunchy.  Upon finding the nest, the hunters stun the insects with smoke, then use chain saws and shovels to extract it. Torao Suzuki, 75, said he removed 40 to 50 nests a year, getting stung as many as 30 times each season. "Even when I tell people, they're going to sting you, they still eat them. They say it makes them potent," he said. Lacquered brown hives, sometimes cut open to expose their complex lattice work, adorn vestibules and reception rooms in homes, schools and public offices. Historians say the insects, which range throughout Asia but are found most commonly in Japan, were once valued along with other wasps as a cheap source of protein in poverty-stricken rural areas. The cuisine is celebrated each November in Gifu Prefecture at a festival, known as the Kushihara Hebo Matsuri, where prizes are handed out for the largest nests, and gourmands bid for the privilege of taking one home with them. A flyer for the 2018 event warned participants to be on the lookout for hornets on the loose near the fairgrounds, advising attendees to "please take ample care to avoid being stung." Shota Toguchida, who owns a Chinese restaurant in the city, said he sold shots of homemade hornet liquor for 2,000 yen, or about $19, mostly to middle-aged men.
 
 ## Trump’s anti-China rhetoric aimed at boosting US leverage
