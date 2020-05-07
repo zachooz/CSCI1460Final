@@ -6,6 +6,9 @@ A pretrained model can be found here: https://drive.google.com/file/d/1hE37YKcWB
 
 After training the model simply copy and paste a news article into a text file and call `python main.py -l -F <path to file>` to summarize the news article.
 
+# Architecture
+This model first builds sentence embeddings by passing word embeddings to a GRU and then creates passes these embeddings to another GRU to make predictions.
+
 # Example summaries
 
 ## Billions projected to suffer nearly unlivable heat in 2070
