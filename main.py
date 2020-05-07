@@ -1,4 +1,3 @@
-from comet_ml import Experiment
 from model import SummaryModel
 from torch.utils.data import DataLoader, random_split
 from torch import nn, optim
