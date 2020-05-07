@@ -1,6 +1,6 @@
 # Summary Generation
 
-This model is trained the the CNN/Dailymail summarization dataset and performs extractive summarization. To train please call `python main.py -l -T <path to dataset>`
+This model is trained the the CNN/Dailymail summarization dataset and performs extractive summarization. To train please call `python main.py -l -T <path to dataset>`. 
 
 A pretrained model can be found here: https://drive.google.com/file/d/1hE37YKcWBKeI0YviiUjzrcyYHgboPsAR/view?usp=sharing
 
